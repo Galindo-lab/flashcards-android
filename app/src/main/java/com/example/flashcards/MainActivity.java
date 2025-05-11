@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.flashcards.activities.DeckDetailsActivity;
 import com.example.flashcards.activities.DeckListActivity;
 import com.example.flashcards.models.Deck;
 
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onGoToDeckListClick(View view) {
-        Intent intent = new Intent(this, DeckListActivity.class);
+        Intent intent = new Intent(this, DeckDetailsActivity.class);
         startActivity(intent);
     }
 

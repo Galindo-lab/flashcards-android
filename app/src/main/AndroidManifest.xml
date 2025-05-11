@@ -13,6 +13,9 @@
         android:theme="@style/Theme.FlashCards"
         tools:targetApi="31">
         <activity
+            android:name=".activities.DeckDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.DeckListActivity"
             android:exported="false" />
         <activity
