@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.activities.DeckDetailsActivity;
+import com.example.flashcards.activities.cardList.CardListActivity;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -62,10 +63,8 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
         List<Deck> decks;
 
         try (DBHelper dbHelper = new DBHelper(this)) {
-
             recyclerView = findViewById(R.id.deck_recycler_view);
             recyclerView.setHasFixedSize(true);
-
             decks = dbHelper.getAllDecks();
         }
 
@@ -75,8 +74,8 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
 
     @Override
     public void onDeckClick(Deck deck) {
-        // Manejar el clic en el deck
-
+        Intent intent = new Intent(this, CardListActivity.class);
+        startActivity(intent);
     }
 
     public void floatingButtonOnClick(View view) {
