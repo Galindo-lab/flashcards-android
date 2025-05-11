@@ -47,9 +47,17 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
             onBackPressed();
         });
 
+        loadDecks();
+    }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        // Recargar los decks cuando la actividad se reinicie
+        loadDecks();
+    }
 
-        // Cargar la lista de decks
+    private void loadDecks() {
         RecyclerView recyclerView;
         List<Deck> decks;
 
