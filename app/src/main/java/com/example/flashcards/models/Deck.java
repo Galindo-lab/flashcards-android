@@ -2,7 +2,9 @@ package com.example.flashcards.models;
 
 import androidx.annotation.NonNull;
 
-public class Deck {
+import java.io.Serializable;
+
+public class Deck implements Serializable {
     private int id;
     private String name;
     private String description;

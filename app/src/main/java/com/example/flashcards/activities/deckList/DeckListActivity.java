@@ -75,6 +75,8 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
     @Override
     public void onDeckClick(Deck deck) {
         Intent intent = new Intent(this, CardListActivity.class);
+        intent.putExtra("deck_data", deck);
+
         startActivity(intent);
     }
 
