@@ -16,7 +16,7 @@
             android:name=".activities.DeckDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.DeckListActivity"
+            android:name=".activities.deckList.DeckListActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

@@ -34,7 +34,6 @@ public class DeckDetailsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        // Opción 1: Manejar clic en la toolbar
         toolbar.setNavigationOnClickListener(v -> {
             onBackPressed();
         });
