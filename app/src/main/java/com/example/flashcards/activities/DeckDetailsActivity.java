@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -83,11 +84,12 @@ public class DeckDetailsActivity extends AppCompatActivity {
 
 
     public void saveDeck(View view) {
-        Deck foo;
-
         try {
-            foo = getFormData();
-            Toast.makeText(this, "Exito!", Toast.LENGTH_LONG).show();
+            DBHelper dbHelper = new DBHelper(getApplicationContext());
+            Deck foo = getFormData();
+
+            long deckId = dbHelper.createDeck(foo);
+            Toast.makeText(this, "Exito! " + deckId, Toast.LENGTH_LONG).show();
 
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
