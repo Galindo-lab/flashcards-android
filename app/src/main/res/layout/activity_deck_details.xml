@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:elevation="0dp"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Editar Mazo"/>
+        app:title="Mazo"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                     android:id="@+id/etDeckName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nombre del mazo"
+                    android:hint="Nombre"
                     android:inputType="textCapWords"
                     android:maxLines="1"
                     tools:text="Mi Mazo de Ejemplo" />
@@ -91,7 +91,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Marcar como favorito"
+                    android:text="favorito"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
@@ -104,11 +104,12 @@
             <!-- Botón Guardar -->
             <Button
                 android:id="@+id/btnSaveDeck"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Guardar"
-                style="@style/Widget.MaterialComponents.Button"/>
+                android:onClick="saveDeck"
+                android:text="Guardar" />
 
         </LinearLayout>
     </ScrollView>

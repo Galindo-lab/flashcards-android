@@ -68,9 +68,7 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
     @Override
     public void onDeckClick(Deck deck) {
         // Manejar el clic en el deck
-        Intent intent = new Intent(this, DeckDetailsActivity.class);
-        intent.putExtra("DECK_ID", deck.getId());
-        startActivity(intent);
+
     }
 
     public void floatingButtonOnClick(View view) {
