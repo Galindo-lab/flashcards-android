@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
+import com.example.flashcards.activities.DeckDetailsActivity;
 import com.example.flashcards.activities.deckList.DeckListActivity;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -65,9 +66,14 @@ public class CardListActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (id == R.id.action_edit) {
-            Toast.makeText(this, "Edit", Toast.LENGTH_LONG).show();
+            // cargar los datos para editar el deck
+            Intent intent = new Intent(this, DeckDetailsActivity.class);
+            intent.putExtra("deck_data", deck);
+            startActivity(intent);
+
             return true;
         } else if (id == R.id.action_delete) {
+            // dialog para eliminar tajeta
             ShowDeleteConfiramtionDialog();
             return true;
         }
@@ -94,18 +100,8 @@ public class CardListActivity extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Confirmar eliminación")
                 .setMessage("¿Estás seguro de que deseas eliminar este mazo?")
-                .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        deleteDeck();
-                    }
-                })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss(); // Cierra el diálogo sin hacer nada
-                    }
-                })
+                .setPositiveButton("Eliminar", (dialog, which) -> deleteDeck())
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 

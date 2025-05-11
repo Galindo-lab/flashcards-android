@@ -23,6 +23,13 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class DeckDetailsActivity extends AppCompatActivity {
 
+
+    private Deck deck;
+    private TextInputEditText etDeckName;
+    private TextInputEditText etDeckDescription;
+    private TextInputEditText etDeckCategory;
+    private SwitchCompat switchFavorite;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,80 +41,95 @@ public class DeckDetailsActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Configurar Toolbar
+        initializeViews();
+        loadDeckData();
+        setupToolbar();
+    }
+
+    private void initializeViews() {
+        etDeckName = findViewById(R.id.etDeckName);
+        etDeckDescription = findViewById(R.id.etDeckDescription);
+        etDeckCategory = findViewById(R.id.etDeckCategory);
+        switchFavorite = findViewById(R.id.switchFavorite);
+    }
+
+    private void loadDeckData() {
+        deck = (Deck) getIntent().getSerializableExtra("deck_data");
+
+        if (deck == null) {
+            Toast.makeText(this, "No se encontró el deck", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        etDeckName.setText(deck.getName() != null ? deck.getName() : "");
+        etDeckDescription.setText(deck.getDescription() != null ? deck.getDescription() : "");
+        etDeckCategory.setText(deck.getCategory() != null ? deck.getCategory() : "");
+        switchFavorite.setChecked(deck.isFavorite());
+    }
+
+    private void setupToolbar() {
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Habilitar botón de retroceso
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        toolbar.setNavigationOnClickListener(v -> {
-            onBackPressed();
-        });
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
-
-    public Deck getFormData() throws Exception {
-        try {
-            // Obtener referencias a los elementos del formulario
-            TextInputEditText etDeckName = findViewById(R.id.etDeckName);
-            TextInputEditText etDeckDescription = findViewById(R.id.etDeckDescription);
-            TextInputEditText etDeckCategory = findViewById(R.id.etDeckCategory);
-            SwitchCompat switchFavorite = findViewById(R.id.switchFavorite);
-
-            // Validar que los campos existen
-            if (etDeckName == null || etDeckDescription == null ||
-                    etDeckCategory == null || switchFavorite == null) {
-                throw new Exception("Error al acceder a los campos del formulario");
-            }
-
-            // Obtener y validar los valores
-            String name = etDeckName.getText().toString().trim();
-            if (name.isEmpty()) {
-                throw new Exception("El nombre del mazo es obligatorio");
-            }
-
-            // Crear el objeto Deck
-            Deck deck = new Deck();
-            deck.setName(name);
-            deck.setDescription(etDeckDescription.getText().toString().trim());
-            deck.setCategory(etDeckCategory.getText().toString().trim());
-            deck.setFavorite(switchFavorite.isChecked());
-
-            return deck;
-
-        } catch (Exception e) {
-            // Relanzar la excepción para que el llamante la maneje
-            throw new Exception(e.getMessage(), e);
-        }
-    }
-
-
 
     public void saveDeck(View view) {
         try {
-            DBHelper dbHelper = new DBHelper(getApplicationContext());
-            Deck deck = getFormData();
 
-            if (dbHelper.createDeck(deck) == -1) {
-                Toast.makeText(this, "Un Error ha ocurrido", Toast.LENGTH_LONG).show();
-                return;
+            Deck formDeck = getFormData();
+            DBHelper dbHelper = new DBHelper(this);
+            boolean isNewDeck = deck == null;
+
+            if (isNewDeck) {
+                long result = dbHelper.createDeck(formDeck);
+                if (result == -1) throw new Exception("Error al crear el deck");
+                deck = formDeck;
+            } else {
+                updateDeckData(formDeck);
+                if (dbHelper.updateDeck(deck) == 0) throw new Exception("Error al actualizar el deck");
             }
 
-            Toast.makeText(this, "Mazo '" + deck.getName() + "' creado", Toast.LENGTH_LONG).show();
-
-            Intent intent = new Intent(this, CardListActivity.class);
-            intent.putExtra("deck_data", deck);
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            startActivity(intent);
-            finish();
-
+            navigateToCardList();
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    private void updateDeckData(Deck newData) {
+        deck.setName(newData.getName());
+        deck.setDescription(newData.getDescription());
+        deck.setCategory(newData.getCategory());
+        deck.setFavorite(newData.isFavorite());
+    }
+
+    private Deck getFormData() throws Exception {
+        String name = etDeckName.getText().toString().trim();
+        if (name.isEmpty()) {
+            throw new Exception("El nombre del mazo es obligatorio");
+        }
+
+        Deck foo = new Deck();
+
+        foo.setName(name);
+        foo.setDescription(etDeckDescription.getText().toString().trim());
+        foo.setCategory(etDeckCategory.getText().toString().trim());
+        foo.setFavorite(switchFavorite.isChecked());
+
+        return foo;
+    }
+
+    private void navigateToCardList() {
+        Intent intent = new Intent(this, CardListActivity.class);
+        intent.putExtra("deck_data", deck);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 }
