@@ -1,6 +1,7 @@
 
 package com.example.flashcards.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
+import com.example.flashcards.activities.cardList.CardListActivity;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -87,10 +89,22 @@ public class DeckDetailsActivity extends AppCompatActivity {
     public void saveDeck(View view) {
         try {
             DBHelper dbHelper = new DBHelper(getApplicationContext());
-            Deck foo = getFormData();
+            Deck deck = getFormData();
 
-            long deckId = dbHelper.createDeck(foo);
-            Toast.makeText(this, "Exito! " + deckId, Toast.LENGTH_LONG).show();
+            if (dbHelper.createDeck(deck) == -1) {
+                Toast.makeText(this, "Un Error ha ocurrido", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Toast.makeText(this, "Mazo '" + deck.getName() + "' creado", Toast.LENGTH_LONG).show();
+
+            Intent intent = new Intent(this, CardListActivity.class);
+            intent.putExtra("deck_data", deck);
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            startActivity(intent);
+            finish();
 
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
