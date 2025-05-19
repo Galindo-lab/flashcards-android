@@ -1,10 +1,10 @@
 package com.example.flashcards.activities.cardList;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -12,18 +12,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
+import com.example.flashcards.activities.CreateCardActivity;
 import com.example.flashcards.activities.DeckDetailsActivity;
+import com.example.flashcards.activities.deckList.DeckAdapter;
 import com.example.flashcards.activities.deckList.DeckListActivity;
+import com.example.flashcards.models.Card;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class CardListActivity extends AppCompatActivity {
+import java.util.List;
+
+public class CardListActivity extends AppCompatActivity implements CardAdapter.OnCardClickListener {
 
     private Deck deck;
+    private RecyclerView recyclerView;
+    private CardAdapter cardAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,8 @@ public class CardListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         this.deck = (Deck) intent.getSerializableExtra("deck_data");
 
+
+
         // cargar barra
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -50,6 +61,39 @@ public class CardListActivity extends AppCompatActivity {
 
         toolbar.setTitle(this.deck.getName());
 
+        createTestCardInDatabase();
+        loadCards();
+    }
+
+    private void loadCards() {
+        RecyclerView recyclerView;
+        List<Card> cards;
+
+        try (DBHelper dbHelper = new DBHelper(this)) {
+            recyclerView = findViewById(R.id.card_recycler_view);
+            recyclerView.setHasFixedSize(true);
+            cards = dbHelper.getAllCardsInDeck(this.deck.getId());
+        }
+
+        CardAdapter adapter = new CardAdapter(cards, this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void createTestCardInDatabase() {
+        // Verificar si ya existe una card de prueba para evitar duplicados
+        try (DBHelper dbHelper = new DBHelper(this)) {
+            List<Card> existingCards = dbHelper.getAllCardsInDeck(deck.getId());
+            if (existingCards.isEmpty()) {
+                Card testCard = new Card(
+                        deck.getId(),
+                        "Término de prueba",
+                        "Esta es una definición de prueba",
+                        false
+                );
+                dbHelper.createCard(testCard);
+                Toast.makeText(this, "Card de prueba creada", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -105,4 +149,13 @@ public class CardListActivity extends AppCompatActivity {
                 .show();
     }
 
+    public void floatingButtonOnClick(View view) {
+        Intent intent = new Intent(this, CreateCardActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCardClick(Card card) {
+        System.out.println("a");
+    }
 }
