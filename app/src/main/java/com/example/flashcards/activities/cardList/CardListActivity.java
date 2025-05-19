@@ -156,6 +156,9 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
 
     @Override
     public void onCardClick(Card card) {
-        System.out.println("a");
+        Intent intent = new Intent(this, CreateCardActivity.class);
+        intent.putExtra("card_data", card);
+
+        startActivity(intent);
     }
 }

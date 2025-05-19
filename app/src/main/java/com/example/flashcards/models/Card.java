@@ -1,6 +1,8 @@
 package com.example.flashcards.models;
 
-public class Card {
+import java.io.Serializable;
+
+public class Card implements Serializable {
     private int id;
     private int deckId;
     private String term;
