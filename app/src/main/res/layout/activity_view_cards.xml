@@ -23,15 +23,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvCardCounter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="1/10"
-            android:textAlignment="center"
-            android:textSize="16sp" />
-
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,16 +55,26 @@
                 <TextView
                     android:id="@+id/tvDefinition"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
                     android:text="Definición"
                     android:textAlignment="center"
                     android:textSize="20sp"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone" />
+                    android:visibility="visible"
+                    android:paddingTop="8dp"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+
+        <TextView
+            android:id="@+id/tvCardCounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="1/10"
+            android:textAlignment="center"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,8 +87,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="a" />
-
+                app:icon="@android:drawable/ic_media_previous" />
 
             <Button
                 android:id="@+id/btnShowAnswer"
@@ -100,7 +100,8 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="b" />
+                app:icon="@android:drawable/ic_media_next" />
+
         </LinearLayout>
 
 
