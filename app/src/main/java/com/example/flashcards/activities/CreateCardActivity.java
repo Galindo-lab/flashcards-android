@@ -14,17 +14,19 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.models.Card;
-import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
+import androidx.appcompat.widget.SwitchCompat;
 
 public class CreateCardActivity extends AppCompatActivity {
 
     private TextInputEditText etCardTerm, etCardDefinition;
     private Button btnSaveCard;
+    private SwitchCompat switchFavorite;
     private DBHelper dbHelper;
-    private int deckId; // si se crea
-    private Card card; // si se modifica
+    private int deckId; // for creating new card
+    private Card card; // for editing existing card
+    private boolean isEditMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,35 +39,52 @@ public class CreateCardActivity extends AppCompatActivity {
             return insets;
         });
 
-
-
-        // Inicializar vistas
+        // Initialize views
         etCardTerm = findViewById(R.id.etCardTerm);
         etCardDefinition = findViewById(R.id.etCardDefinition);
         btnSaveCard = findViewById(R.id.btnSaveCard);
+        switchFavorite = findViewById(R.id.switchFavorite);
+        dbHelper = new DBHelper(this);
 
         loadData();
 
-        // Configurar la toolbar
+        // Configure toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        // Set click listener for save button
+        btnSaveCard.setOnClickListener(this::saveCard);
     }
 
-
     public void loadData() {
+        // Check if we're editing an existing card
         card = (Card) getIntent().getSerializableExtra("card_data");
-        if (card == null) {
-            deckId = (Integer) getIntent().getSerializableExtra("deck_id");
+        if (card != null) {
+            isEditMode = true;
+            // Populate fields with card data
+            etCardTerm.setText(card.getTerm());
+            etCardDefinition.setText(card.getDefinition());
+            switchFavorite.setChecked(card.isFavorite());
+            // Update button text
+            btnSaveCard.setText("Actualizar Carta");
+            // Update toolbar title
+            MaterialToolbar toolbar = findViewById(R.id.toolbar);
+            toolbar.setTitle("Editar Carta");
+        } else {
+            // We're creating a new card, get deck ID
+            deckId = getIntent().getIntExtra("deck_id", -1);
+            if (deckId == -1) {
+                Toast.makeText(this, "Error: No se proporcionó el ID del deck", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
     }
 
-
     public void saveCard(View view) {
-        DBHelper dbHelper = new DBHelper(this);
         String term = etCardTerm.getText().toString().trim();
         String definition = etCardDefinition.getText().toString().trim();
 
-        // Validar los campos
+        // Validate fields
         if (term.isEmpty()) {
             etCardTerm.setError("El término es requerido");
             etCardTerm.requestFocus();
@@ -78,17 +97,32 @@ public class CreateCardActivity extends AppCompatActivity {
             return;
         }
 
-        // Crear la nueva carta
-        boolean isFavorite = ((androidx.appcompat.widget.SwitchCompat) findViewById(R.id.switchFavorite)).isChecked();
-        Card newCard = new Card(deckId, term, definition, isFavorite);
-        long cardId = dbHelper.createCard(newCard);
+        boolean isFavorite = switchFavorite.isChecked();
 
-        if (cardId != -1) {
-            Toast.makeText(this, "Carta creada exitosamente", Toast.LENGTH_SHORT).show();
-            finish(); // Cerrar la actividad después de guardar
+        if (isEditMode) {
+            // Update existing card
+            card.setTerm(term);
+            card.setDefinition(definition);
+            card.setFavorite(isFavorite);
+
+            int rowsAffected = dbHelper.updateCard(card);
+            if (rowsAffected > 0) {
+                Toast.makeText(this, "Carta actualizada exitosamente", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Error al actualizar la carta", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "Error al crear la carta", Toast.LENGTH_SHORT).show();
+            // Create new card
+            Card newCard = new Card(deckId, term, definition, isFavorite);
+            long cardId = dbHelper.createCard(newCard);
+
+            if (cardId != -1) {
+                Toast.makeText(this, "Carta creada exitosamente", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Error al crear la carta", Toast.LENGTH_SHORT).show();
+            }
         }
     }
-
 }
