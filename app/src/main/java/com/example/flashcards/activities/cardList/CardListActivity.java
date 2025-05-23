@@ -18,6 +18,7 @@ import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.activities.CreateCardActivity;
 import com.example.flashcards.activities.DeckDetailsActivity;
+import com.example.flashcards.activities.ViewCardsActivity;
 import com.example.flashcards.activities.deckList.DeckAdapter;
 import com.example.flashcards.activities.deckList.DeckListActivity;
 import com.example.flashcards.models.Card;
@@ -50,7 +51,6 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
         this.deck = (Deck) intent.getSerializableExtra("deck_data");
 
 
-
         // cargar barra
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -61,7 +61,6 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
 
         toolbar.setTitle(this.deck.getName());
 
-        createTestCardInDatabase();
         loadCards();
     }
 
@@ -79,22 +78,6 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
         recyclerView.setAdapter(adapter);
     }
 
-    private void createTestCardInDatabase() {
-        // Verificar si ya existe una card de prueba para evitar duplicados
-        try (DBHelper dbHelper = new DBHelper(this)) {
-            List<Card> existingCards = dbHelper.getAllCardsInDeck(deck.getId());
-            if (existingCards.isEmpty()) {
-                Card testCard = new Card(
-                        deck.getId(),
-                        "Término de prueba",
-                        "Esta es una definición de prueba",
-                        false
-                );
-                dbHelper.createCard(testCard);
-                Toast.makeText(this, "Card de prueba creada", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,6 +102,11 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
         } else if (id == R.id.action_delete) {
             // dialog para eliminar tajeta
             ShowDeleteConfiramtionDialog();
+            return true;
+        } else if (id == R.id.action_practice) {
+            Intent intent = new Intent(this, ViewCardsActivity.class);
+            intent.putExtra("deck_id", deck.getId()); // deckId es el ID del deck que quieres ver
+            startActivity(intent);
             return true;
         }
 
