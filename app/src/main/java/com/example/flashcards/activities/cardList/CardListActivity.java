@@ -151,6 +151,8 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
 
     public void floatingButtonOnClick(View view) {
         Intent intent = new Intent(this, CreateCardActivity.class);
+        intent.putExtra("deck_id", deck.getId());
+
         startActivity(intent);
     }
 
@@ -160,5 +162,12 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
         intent.putExtra("card_data", card);
 
         startActivity(intent);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        // Recargar los decks cuando la actividad se reinicie
+        loadCards();
     }
 }

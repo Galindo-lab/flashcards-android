@@ -1,6 +1,7 @@
 package com.example.flashcards.activities;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -13,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.models.Card;
+import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -21,7 +23,8 @@ public class CreateCardActivity extends AppCompatActivity {
     private TextInputEditText etCardTerm, etCardDefinition;
     private Button btnSaveCard;
     private DBHelper dbHelper;
-    private int deckId;
+    private int deckId; // si se crea
+    private Card card; // si se modifica
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,7 @@ public class CreateCardActivity extends AppCompatActivity {
         etCardDefinition = findViewById(R.id.etCardDefinition);
         btnSaveCard = findViewById(R.id.btnSaveCard);
 
+        loadData();
 
         // Configurar la toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
@@ -48,7 +52,16 @@ public class CreateCardActivity extends AppCompatActivity {
     }
 
 
-    private void saveCard() {
+    public void loadData() {
+        card = (Card) getIntent().getSerializableExtra("card_data");
+        if (card == null) {
+            deckId = (Integer) getIntent().getSerializableExtra("deck_id");
+        }
+    }
+
+
+    public void saveCard(View view) {
+        DBHelper dbHelper = new DBHelper(this);
         String term = etCardTerm.getText().toString().trim();
         String definition = etCardDefinition.getText().toString().trim();
 
