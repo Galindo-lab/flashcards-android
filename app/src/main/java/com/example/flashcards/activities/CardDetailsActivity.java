@@ -21,7 +21,7 @@ import androidx.appcompat.widget.SwitchCompat;
 public class CardDetailsActivity extends AppCompatActivity {
 
     private TextInputEditText etCardTerm, etCardDefinition;
-    private Button btnSaveCard;
+    private Button btnSaveCard, btnDeleteCard;
     private SwitchCompat switchFavorite;
     private DBHelper dbHelper;
     private int deckId; // for creating new card
@@ -43,6 +43,7 @@ public class CardDetailsActivity extends AppCompatActivity {
         etCardTerm = findViewById(R.id.etCardTerm);
         etCardDefinition = findViewById(R.id.etCardDefinition);
         btnSaveCard = findViewById(R.id.btnSaveCard);
+        btnDeleteCard = findViewById(R.id.btnDeleteCard);
         switchFavorite = findViewById(R.id.switchFavorite);
         dbHelper = new DBHelper(this);
 
@@ -67,6 +68,8 @@ public class CardDetailsActivity extends AppCompatActivity {
             switchFavorite.setChecked(card.isFavorite());
             // Update button text
             btnSaveCard.setText("Actualizar Carta");
+            // Show delete button
+            btnDeleteCard.setVisibility(View.VISIBLE);
             // Update toolbar title
             MaterialToolbar toolbar = findViewById(R.id.toolbar);
             toolbar.setTitle("Editar Carta");
@@ -123,6 +126,16 @@ public class CardDetailsActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Error al crear la carta", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    public void deleteCard(View view) {
+        if (isEditMode && card != null) {
+            dbHelper.deleteCard(card.getId());
+            Toast.makeText(this, "Carta eliminada exitosamente", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, "Error al eliminar la carta", Toast.LENGTH_SHORT).show();
         }
     }
 }

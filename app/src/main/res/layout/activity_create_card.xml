@@ -95,6 +95,18 @@
                 android:onClick="saveCard"
                 android:text="Guardar Carta" />
 
+            <!-- Botón Eliminar (solo visible en modo edición) -->
+            <Button
+                android:id="@+id/btnDeleteCard"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:onClick="deleteCard"
+                android:text="Eliminar Carta"
+                android:visibility="gone"
+                app:strokeWidth="1dp" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
