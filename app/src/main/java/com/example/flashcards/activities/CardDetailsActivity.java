@@ -18,7 +18,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import androidx.appcompat.widget.SwitchCompat;
 
-public class CreateCardActivity extends AppCompatActivity {
+public class CardDetailsActivity extends AppCompatActivity {
 
     private TextInputEditText etCardTerm, etCardDefinition;
     private Button btnSaveCard;

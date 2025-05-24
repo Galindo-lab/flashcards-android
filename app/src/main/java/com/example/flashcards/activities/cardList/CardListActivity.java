@@ -16,10 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
-import com.example.flashcards.activities.CreateCardActivity;
+import com.example.flashcards.activities.CardDetailsActivity;
 import com.example.flashcards.activities.DeckDetailsActivity;
+import com.example.flashcards.activities.PracticeModeActivity;
+import com.example.flashcards.activities.QuizModeActivity;
 import com.example.flashcards.activities.ViewCardsActivity;
-import com.example.flashcards.activities.deckList.DeckAdapter;
 import com.example.flashcards.activities.deckList.DeckListActivity;
 import com.example.flashcards.models.Card;
 import com.example.flashcards.models.Deck;
@@ -93,21 +94,42 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
             onBackPressed();
             return true;
         } else if (id == R.id.action_edit) {
-            // cargar los datos para editar el deck
+
             Intent intent = new Intent(this, DeckDetailsActivity.class);
             intent.putExtra("deck_data", deck);
             startActivity(intent);
-
             return true;
+
         } else if (id == R.id.action_delete) {
-            // dialog para eliminar tajeta
+
             ShowDeleteConfiramtionDialog();
             return true;
+
         } else if (id == R.id.action_practice) {
+
             Intent intent = new Intent(this, ViewCardsActivity.class);
             intent.putExtra("deck_id", deck.getId()); // deckId es el ID del deck que quieres ver
             startActivity(intent);
             return true;
+
+        } else if (id == R.id.action_practice2) {
+
+            Intent intent = new Intent(this, PracticeModeActivity.class);
+            intent.putExtra("deck_id", deck.getId());
+            startActivity(intent);
+            return true;
+
+        } else if (id == R.id.action_practice3) {
+            DBHelper dbHelper = new DBHelper(this);
+            int cardCount = dbHelper.getAllCardsInDeck(this.deck.getId()).size();
+
+            if (cardCount >= 3) {
+                Intent intent = new Intent(this, QuizModeActivity.class);
+                intent.putExtra("deck_id", this.deck.getId());
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "El deck necesita al menos 3 tarjetas para el modo Quiz", Toast.LENGTH_LONG).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -138,7 +160,7 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
     }
 
     public void floatingButtonOnClick(View view) {
-        Intent intent = new Intent(this, CreateCardActivity.class);
+        Intent intent = new Intent(this, CardDetailsActivity.class);
         intent.putExtra("deck_id", deck.getId());
 
         startActivity(intent);
@@ -146,7 +168,7 @@ public class CardListActivity extends AppCompatActivity implements CardAdapter.O
 
     @Override
     public void onCardClick(Card card) {
-        Intent intent = new Intent(this, CreateCardActivity.class);
+        Intent intent = new Intent(this, CardDetailsActivity.class);
         intent.putExtra("card_data", card);
 
         startActivity(intent);

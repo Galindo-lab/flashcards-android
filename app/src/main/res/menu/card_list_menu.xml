@@ -4,7 +4,17 @@
 
     <item
         android:id="@+id/action_practice"
-        android:title="Practicar"
+        android:title="Practicar 1"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_practice2"
+        android:title="Practicar 2"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_practice3"
+        android:title="Practicar 3"
         app:showAsAction="never" />
 
     <item
