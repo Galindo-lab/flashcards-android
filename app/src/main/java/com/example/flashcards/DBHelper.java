@@ -179,13 +179,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-
-
-
-
-
     // Métodos para la gestión de Tarjetas
 
     // Método para crear una nueva Tarjeta
@@ -354,4 +347,24 @@ public class DBHelper extends SQLiteOpenHelper {
         return decksInCategory;
     }
 
+
+    // En DBHelper.java, agrega este método en la sección de métodos públicos:
+
+    /**
+     * Método para borrar TODOS los datos de la base de datos (SOLO PARA PRUEBAS)
+     */
+    public void deleteAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Eliminar todas las tarjetas
+            db.delete("cards", null, null);
+            // Eliminar todos los decks
+            db.delete("decks", null, null);
+            Log.d("DBHelper", "Todos los datos han sido eliminados");
+        } catch (Exception e) {
+            Log.e("DBHelper", "Error al eliminar todos los datos", e);
+        } finally {
+            db.close();
+        }
+    }
 }

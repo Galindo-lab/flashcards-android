@@ -1,21 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal|center_vertical"
+    android:orientation="vertical"
+    android:padding="24dp"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onGoToDeckListClick"
-        android:text="@string/button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Contenedor para centrar los elementos horizontalmente -->
+    <LinearLayout
+        android:layout_width="308dp"
+        android:layout_height="542dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Título principal -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Flashcards App"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Por: Luis Eduardo Galindo Amaya"
+            android:textSize="16sp" />
+
+        <!-- Espaciador para separar los textos de los botones -->
+
+        <!-- Botón principal -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoToFlashcards"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:onClick="onGoToDeckListClick"
+            android:text="Ir a flashcards"
+            android:textAllCaps="false"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp" />
+
+        <!-- Botón de prueba (solo visible en modo debug) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteData"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="deleteAllDataForTesting"
+            android:text="Eliminar datos (Pruebas)"
+            android:textAllCaps="false"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+</LinearLayout>
