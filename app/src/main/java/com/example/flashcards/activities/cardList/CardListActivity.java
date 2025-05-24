@@ -72,6 +72,10 @@ public class CardListActivity extends AppCompatActivity implements
             setupLandscapeMode();
         }
 
+        toolbar.setNavigationOnClickListener(v -> {
+            onBackPressed();
+        });
+
         loadCards();
     }
 
