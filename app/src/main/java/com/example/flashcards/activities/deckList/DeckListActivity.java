@@ -3,6 +3,9 @@ package com.example.flashcards.activities.deckList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,9 +22,15 @@ import com.example.flashcards.activities.cardList.CardListActivity;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeckListActivity extends AppCompatActivity implements DeckAdapter.OnDeckClickListener {
+
+    private Spinner categorySpinner;
+    private RecyclerView recyclerView;
+    private DeckAdapter adapter;
+    private List<Deck> allDecks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,27 +57,78 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
             onBackPressed();
         });
 
-        loadDecks();
+        // Inicializar vistas
+        categorySpinner = findViewById(R.id.category_spinner);
+        recyclerView = findViewById(R.id.deck_recycler_view);
+        recyclerView.setHasFixedSize(true);
+
+        // Cargar decks y configurar spinner
+        loadDecksAndCategories();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         // Recargar los decks cuando la actividad se reinicie
-        loadDecks();
+        loadDecksAndCategories();
     }
 
-    private void loadDecks() {
-        RecyclerView recyclerView;
-        List<Deck> decks;
-
+    private void loadDecksAndCategories() {
         try (DBHelper dbHelper = new DBHelper(this)) {
-            recyclerView = findViewById(R.id.deck_recycler_view);
-            recyclerView.setHasFixedSize(true);
-            decks = dbHelper.getAllDecks();
+            // Obtener todos los decks
+            allDecks = dbHelper.getAllDecks();
+
+            // Obtener categorías únicas
+            List<String> categories = new ArrayList<>();
+            categories.add("Todas las categorías"); // Opción por defecto
+
+            for (Deck deck : allDecks) {
+                if (deck.getCategory() != null && !deck.getCategory().isEmpty()
+                        && !categories.contains(deck.getCategory())) {
+                    categories.add(deck.getCategory());
+                }
+            }
+
+            // Configurar el spinner
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                    this, android.R.layout.simple_spinner_item, categories);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            categorySpinner.setAdapter(spinnerAdapter);
+
+            // Mostrar todos los decks inicialmente
+            adapter = new DeckAdapter(allDecks, this);
+            recyclerView.setAdapter(adapter);
+
+            // Listener para el spinner
+            categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedCategory = parent.getItemAtPosition(position).toString();
+                    filterDecksByCategory(selectedCategory);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // No hacer nada
+                }
+            });
+        }
+    }
+
+    private void filterDecksByCategory(String category) {
+        List<Deck> filteredDecks = new ArrayList<>();
+
+        if (category.equals("Todas las categorías")) {
+            filteredDecks.addAll(allDecks);
+        } else {
+            for (Deck deck : allDecks) {
+                if (category.equals(deck.getCategory())) {
+                    filteredDecks.add(deck);
+                }
+            }
         }
 
-        DeckAdapter adapter = new DeckAdapter(decks, this);
+        adapter = new DeckAdapter(filteredDecks, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -76,7 +136,6 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
     public void onDeckClick(Deck deck) {
         Intent intent = new Intent(this, CardListActivity.class);
         intent.putExtra("deck_data", deck);
-
         startActivity(intent);
     }
 
