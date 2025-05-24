@@ -1,7 +1,9 @@
 package com.example.flashcards.activities.deckList;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -9,6 +11,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,8 +23,10 @@ import com.example.flashcards.DBHelper;
 import com.example.flashcards.R;
 import com.example.flashcards.activities.DeckDetailsActivity;
 import com.example.flashcards.activities.cardList.CardListActivity;
+import com.example.flashcards.models.Card;
 import com.example.flashcards.models.Deck;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +146,100 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
     }
 
     public void floatingButtonOnClick(View view) {
-        Intent intent = new Intent(this, DeckDetailsActivity.class);
-        startActivity(intent);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Crear nuevo deck")
+                .setMessage("¿Deseas crear un deck con IA?")
+                .setPositiveButton("Sí, con IA", (dialog, which) -> showImageSourceDialog())
+                .setNegativeButton("No, manualmente", (dialog, which) -> {
+                    Intent intent = new Intent(this, DeckDetailsActivity.class);
+                    startActivity(intent);
+                })
+                .show();
+    }
+
+    private void showImageSourceDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Seleccionar fuente de imagen")
+                .setItems(new String[]{"Tomar foto", "Elegir de galería"}, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Tomar foto
+                            break;
+                        case 1: // Elegir de galería
+                            openGallery();
+                            break;
+                    }
+                })
+                .show();
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(galleryIntent);
+    }
+
+    // Declara estos launchers al inicio de la clase junto con los otros
+    private ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri selectedImageUri = result.getData().getData();
+                    createAIDemoDeck("Galería");
+                }
+            });
+
+    private void createAIDemoDeck(String source) {
+        try (DBHelper dbHelper = new DBHelper(this)) {
+            Deck demoDeck = new Deck();
+            demoDeck.setName("Demo desde " + source);
+            demoDeck.setDescription("Deck generado desde " + (source.equals("Cámara") ? "una foto" : "la galería"));
+            demoDeck.setCategory(source);
+
+            long deckId = dbHelper.createDeck(demoDeck);
+
+            String[] terms = {"Concepto 1", "Concepto 2", "Tema principal"};
+            String[] definitions = {
+                    "Información extraída de la " + source.toLowerCase(),
+                    "Datos relevantes identificados",
+                    "Análisis generado automáticamente"
+            };
+
+            for (int i = 0; i < terms.length; i++) {
+                Card card = new Card((int) deckId, terms[i], definitions[i], false);
+                dbHelper.createCard(card);
+            }
+
+            Toast.makeText(this, "Deck creado desde " + source, Toast.LENGTH_SHORT).show();
+            loadDecksAndCategories();
+        }
+    }
+
+    private void createAIDemoDeck() {
+        try (DBHelper dbHelper = new DBHelper(this)) {
+            // Crear un deck de prueba con IA
+            Deck demoDeck = new Deck();
+            demoDeck.setName("Demo generado por IA");
+            demoDeck.setDescription("Este es un deck de demostración generado automáticamente");
+            demoDeck.setCategory("IA");
+
+            // Guardar el deck en la base de datos
+            long deckId = dbHelper.createDeck(demoDeck);
+
+            // Crear algunas tarjetas de prueba
+            String[] terms = {"Machine Learning", "Neural Network", "Deep Learning", "Natural Language Processing"};
+            String[] definitions = {
+                    "Rama de la IA que permite a los sistemas aprender de datos",
+                    "Sistema de algoritmos que imita el funcionamiento del cerebro humano",
+                    "Subcampo del ML que utiliza redes neuronales con múltiples capas",
+                    "Capacidad de una computadora para entender el lenguaje humano"
+            };
+
+            for (int i = 0; i < terms.length; i++) {
+                Card card = new Card((int) deckId, terms[i], definitions[i], false);
+                dbHelper.createCard(card);
+            }
+
+            Toast.makeText(this, "Deck generado por IA creado", Toast.LENGTH_SHORT).show();
+            loadDecksAndCategories(); // Recargar la lista
+        }
     }
 }
