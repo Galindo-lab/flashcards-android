@@ -4,27 +4,27 @@
 
     <item
         android:id="@+id/action_practice"
-        android:title="Practicar 1"
+        android:title="Revisión básica"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_practice2"
-        android:title="Practicar 2"
+        android:title="Modo escritura"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_practice3"
-        android:title="Practicar 3"
+        android:title="Modo selección"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_edit"
-        android:title="Editar"
+        android:title="Editar mazo"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_delete"
-        android:title="Eliminar"
+        android:title="Eliminar mazo"
         app:showAsAction="never" />
 
 </menu>

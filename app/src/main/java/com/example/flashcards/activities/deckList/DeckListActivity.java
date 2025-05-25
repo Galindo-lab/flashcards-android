@@ -29,14 +29,20 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DeckListActivity extends AppCompatActivity implements DeckAdapter.OnDeckClickListener {
 
+    private Deck deck;
     private Spinner categorySpinner;
     private RecyclerView recyclerView;
     private DeckAdapter adapter;
     private List<Deck> allDecks;
+
+    // Para manejar la cámara y permisos
+    private ActivityResultLauncher<Intent> cameraLauncher;
+    private ActivityResultLauncher<String> requestCameraPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,7 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
 
         // Cargar decks y configurar spinner
         loadDecksAndCategories();
+        initializeCameraLaunchers();
     }
 
     @Override
@@ -78,6 +85,75 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
         // Recargar los decks cuando la actividad se reinicie
         loadDecksAndCategories();
     }
+
+    private void initializeCameraLaunchers() {
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && deck != null) {
+                        // Simulamos la generación de tarjetas desde la foto
+                        generateCardsFromPhoto();
+                    }
+                });
+
+        requestCameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                            openCamera();
+                    } else {
+                        Toast.makeText(this, "Se necesita permiso de la cámara", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
+    private void openCamera() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            cameraLauncher.launch(cameraIntent);
+        } else {
+            Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void generateCardsFromPhoto() {
+        // Esto es un demo - en una app real aquí procesarías la imagen con IA
+        // Por ahora generamos tarjetas de ejemplo
+
+        List<Card> demoCards = Arrays.asList(
+                new Card(deck.getId(), "Concepto 1", "Definición generada desde foto", false),
+                new Card(deck.getId(), "Término clave", "Explicación automática", false),
+                new Card(deck.getId(), "Dato importante", "Información extraída de la imagen", false)
+        );
+
+        try (DBHelper dbHelper = new DBHelper(this)) {
+            for (Card card : demoCards) {
+                dbHelper.createCard(card);
+            }
+            Toast.makeText(this, "3 tarjetas generadas desde la foto", Toast.LENGTH_SHORT).show();
+
+            // Mostrar diálogo de éxito
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Tarjetas generadas")
+                    .setMessage("Se han creado 3 tarjetas basadas en la foto")
+                    .setPositiveButton("Ver tarjetas", (dialog, which) -> navigateToCardList())
+                    .setNegativeButton("Seguir editando", null)
+                    .show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error al guardar tarjetas: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navigateToCardList() {
+        Intent intent = new Intent(this, CardListActivity.class);
+        intent.putExtra("deck_data", deck);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 
     private void loadDecksAndCategories() {
         try (DBHelper dbHelper = new DBHelper(this)) {
@@ -163,6 +239,7 @@ public class DeckListActivity extends AppCompatActivity implements DeckAdapter.O
                 .setItems(new String[]{"Tomar foto", "Elegir de galería"}, (dialog, which) -> {
                     switch (which) {
                         case 0: // Tomar foto
+                            openCamera();
                             break;
                         case 1: // Elegir de galería
                             openGallery();
